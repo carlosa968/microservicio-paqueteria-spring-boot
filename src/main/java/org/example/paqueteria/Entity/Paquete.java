@@ -13,7 +13,7 @@ public class Paquete {
     private Long id;
     private Double pesoKg ;
     private String zonaDestino = "";
-    private Boolean esClienteFrecuente = true;
+    private boolean esClienteFrecuente;
     private Integer distanciaKm = 0;
     private Double costoEnvio ;
     private String prioridad = "";
@@ -54,10 +54,10 @@ public class Paquete {
      }
 
      //
-    public Boolean getEsClienteFrecuente(){
+    public boolean getEsClienteFrecuente(){
         return esClienteFrecuente;
     }
-    public void setEsClienteFrecuente(Boolean esClienteFrecuente){
+    public void setEsClienteFrecuente(boolean esClienteFrecuente){
         this.esClienteFrecuente= esClienteFrecuente;
     }
 
