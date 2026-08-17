@@ -1,4 +1,4 @@
-package org.example.paqueteria.Entity;
+package org.example.paqueteria.paquete.Entity;
 import jakarta.persistence.*;
 
 @Entity
