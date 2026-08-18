@@ -1,6 +1,6 @@
-package org.example.paqueteria.paquete.Repository;
+package org.example.paqueteria.descuento.Repository;
 
-import org.example.paqueteria.paquete.Entity.Descuentos;
+import org.example.paqueteria.descuento.Entity.Descuentos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional; // <--- No olvides este import

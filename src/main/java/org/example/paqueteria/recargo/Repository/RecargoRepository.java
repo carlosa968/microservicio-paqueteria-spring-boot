@@ -1,6 +1,6 @@
-package org.example.paqueteria.paquete.Repository;
+package org.example.paqueteria.recargo.Repository;
 
-import org.example.paqueteria.paquete.Entity.Recargo;
+import org.example.paqueteria.recargo.Entity.Recargo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional; // <--- No olvides este import

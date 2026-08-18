@@ -4,9 +4,9 @@ import org.example.paqueteria.cliente.Entity.Cliente;
 import org.example.paqueteria.cliente.Repository.ClienteRepository;
 import org.example.paqueteria.paquete.Entity.Paquete;
 import org.example.paqueteria.costobase.Repository.CostoBaseRepository;
-import org.example.paqueteria.paquete.Repository.DescuentosRepository;
+import org.example.paqueteria.descuento.Repository.DescuentosRepository;
 import org.example.paqueteria.paquete.Repository.PaqueteRepository;
-import org.example.paqueteria.paquete.Repository.RecargoRepository;
+import org.example.paqueteria.recargo.Repository.RecargoRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
