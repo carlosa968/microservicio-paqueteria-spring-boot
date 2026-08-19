@@ -24,7 +24,7 @@ public class Paquete {
 
     private Double pesoKg;
     private String zonaDestino = "";
-    private boolean esClienteFrecuente;
+    //private boolean esClienteFrecuente;
     private Integer distanciaKm = 0;
     private Double costoEnvio;
     private String prioridad = "";

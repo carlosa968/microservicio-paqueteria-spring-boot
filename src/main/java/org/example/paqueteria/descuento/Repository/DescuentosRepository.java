@@ -8,5 +8,5 @@ import java.util.Optional; // <--- No olvides este import
 @Repository
 public interface DescuentosRepository extends JpaRepository<Descuentos, Long> {
     // Método optimizado para buscar descuento sin usar findAll()
-    Optional<Descuentos> findByEsClienteFrecuente(Boolean esClienteFrecuente);
+    Optional<Descuentos> findByEsClienteFrecuente(boolean esClienteFrecuente);
 }

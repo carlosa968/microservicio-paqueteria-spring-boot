@@ -52,7 +52,7 @@ public class PaqueteService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + clienteId));
         paquete.setCliente(cliente);
 
-        // 1. Traemos la regla de Costo Base (asumiendo que hay un registro principal o usamos findFirst)
+        // 1. Traemos la regla de Costo Base
         var costoBaseList = costoBaseRepository.findAll();
         double costoBase = 0.0;
         double limiteKilos = 0.0;
@@ -71,14 +71,17 @@ public class PaqueteService {
             costoTotal += kilosExtras * costoExtra;
         }
 
-        // 3. OPTIMIZACIÓN: Buscamos el recargo directamente por zona (Sin listar toda la tabla)
+        // 3. Buscamos el recargo directamente por zona
         var recargoOpt = recargoRepository.findByZona(paquete.getZonaDestino());
         if (recargoOpt.isPresent()) {
             costoTotal += recargoOpt.get().getMontoRecargo();
         }
 
-        // 4. OPTIMIZACIÓN: Buscamos el descuento directamente por estatus de frecuencia
-        var descuentoOpt = descuentosRepository.findByEsClienteFrecuente(paquete.isEsClienteFrecuente());
+        // 4. LÓGICA DE CLIENTE FRECUENTE Y APLICACIÓN DE DESCUENTO
+        long totalEnvios = paqueteRepository.countByClienteId(clienteId);
+        boolean esClienteFrecuente = (totalEnvios >= 2);
+
+        var descuentoOpt = descuentosRepository.findByEsClienteFrecuente(esClienteFrecuente);
         if (descuentoOpt.isPresent()) {
             double porcentajeDescuento = descuentoOpt.get().getDescuento();
             if (porcentajeDescuento > 0) {
@@ -93,7 +96,7 @@ public class PaqueteService {
             paquete.setPrioridad("Normal");
         }
 
-        // 6. Guardamos el costo final calculado
+        // 6. Guardamos el costo final ya con todos los cargos y descuentos aplicados
         paquete.setCostoEnvio(costoTotal);
 
         // 7. Persistimos en la BD

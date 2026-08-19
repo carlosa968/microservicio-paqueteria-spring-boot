@@ -11,7 +11,7 @@ public class PaqueteDto {
     private Long id;
     private Double pesoKg;
     private String zonaDestino;
-    private boolean esClienteFrecuente;
+    //private boolean esClienteFrecuente;
     private Integer distanciaKm;
     private Double costoEnvio;
     private String prioridad;

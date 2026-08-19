@@ -14,7 +14,7 @@ public class PaqueteMapper {
         dto.setId(paquete.getId());
         dto.setPesoKg(paquete.getPesoKg());
         dto.setZonaDestino(paquete.getZonaDestino());
-        dto.setEsClienteFrecuente(paquete.isEsClienteFrecuente());
+        //dto.setEsClienteFrecuente(paquete.isEsClienteFrecuente());
         dto.setDistanciaKm(paquete.getDistanciaKm());
         dto.setCostoEnvio(paquete.getCostoEnvio());
         dto.setPrioridad(paquete.getPrioridad());
@@ -35,7 +35,7 @@ public class PaqueteMapper {
         paquete.setId(dto.getId());
         paquete.setPesoKg(dto.getPesoKg());
         paquete.setZonaDestino(dto.getZonaDestino());
-        paquete.setEsClienteFrecuente(dto.isEsClienteFrecuente());
+        //paquete.setEsClienteFrecuente(dto.isEsClienteFrecuente());
         paquete.setDistanciaKm(dto.getDistanciaKm());
         paquete.setCostoEnvio(dto.getCostoEnvio());
         paquete.setPrioridad(dto.getPrioridad());

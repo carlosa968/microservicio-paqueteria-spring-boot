@@ -45,7 +45,7 @@ public class PaqueteController {
         if (paqueteExistente != null) {
             paqueteExistente.setPesoKg(dto.getPesoKg());
             paqueteExistente.setZonaDestino(dto.getZonaDestino());
-            paqueteExistente.setEsClienteFrecuente(dto.isEsClienteFrecuente());
+            //paqueteExistente.setEsClienteFrecuente(dto.isEsClienteFrecuente());
             paqueteExistente.setDistanciaKm(dto.getDistanciaKm());
 
             Paquete actualizado = paqueteService.guardar(paqueteExistente, clienteId);

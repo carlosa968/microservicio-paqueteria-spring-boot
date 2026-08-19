@@ -7,4 +7,5 @@ import org.example.paqueteria.paquete.Entity.Paquete; // importacion de la entid
 
 @Repository
 public interface PaqueteRepository extends JpaRepository <Paquete, Long>{
+    long countByClienteId(Long cliente_id);
 }
