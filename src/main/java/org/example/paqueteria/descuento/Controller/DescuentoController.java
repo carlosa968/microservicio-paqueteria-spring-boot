@@ -1,5 +1,6 @@
 package org.example.paqueteria.descuento.Controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.costobase.Dto.CostoBaseDto;
 import org.example.paqueteria.costobase.Service.CostoBaseService;
 import org.example.paqueteria.descuento.Dto.DescuentoDto;
@@ -13,10 +14,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/descuentos")
+@RequiredArgsConstructor
+
 public class DescuentoController {
 
-    @Autowired
-    private DescuentoService descuentoService;
+    private final DescuentoService descuentoService;
+
 
     // GET: Obtener todos
     @GetMapping
@@ -42,8 +45,7 @@ public class DescuentoController {
     // PUT: Actualizar un costo base existente
     @PutMapping("/{id}")
     public ResponseEntity<DescuentoDto> actualizar(@PathVariable Long id, @RequestBody DescuentoDto descuentoDto) {
-        descuentoDto.setId(id); // Aseguramos que se actualice el ID correcto
-        DescuentoDto actualizado = descuentoService.guardar(descuentoDto);
+        DescuentoDto actualizado = descuentoService.actualizar(id, descuentoDto);
         return ResponseEntity.ok(actualizado);
     }
 

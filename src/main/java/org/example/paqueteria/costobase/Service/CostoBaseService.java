@@ -1,5 +1,6 @@
 package org.example.paqueteria.costobase.Service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.costobase.Dto.CostoBaseDto;
 import org.example.paqueteria.costobase.Entity.CostoBase;
 import org.example.paqueteria.costobase.Mapper.CostoBaseMapper;
@@ -11,10 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CostoBaseService {
 
-    @Autowired
-    private CostoBaseRepository costoBaseRepository;
+
+    private final  CostoBaseRepository costoBaseRepository;
 
     // Listar todos los costos base
     public List<CostoBaseDto> listarTodos() {
@@ -36,6 +38,17 @@ public class CostoBaseService {
         CostoBase entidad = CostoBaseMapper.toEntity(costoBaseDto);
         CostoBase entidadGuardada = costoBaseRepository.save(entidad);
         return CostoBaseMapper.toDto(entidadGuardada);
+    }
+    //Actuliazar
+    public CostoBaseDto actualizar (Long id, CostoBaseDto dto){
+        CostoBase costobExistente = costoBaseRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Costo Base no encontrdo por el ID: " + id));
+        costobExistente.setCostoBase(dto.getCostoBase());
+        costobExistente.setCostoExtra(dto.getCostoExtra());
+        costobExistente.setLimiteKilos(dto.getLimiteKilos());
+
+        CostoBase actualizado = costoBaseRepository.save(costobExistente);
+        return  CostoBaseMapper.toDto(actualizado);
     }
 
     // Eliminar

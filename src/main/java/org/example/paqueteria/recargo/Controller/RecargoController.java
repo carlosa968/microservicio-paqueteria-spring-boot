@@ -1,4 +1,5 @@
 package org.example.paqueteria.recargo.Controller;
+import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.costobase.Dto.CostoBaseDto;
 import org.example.paqueteria.recargo.Dto.RecargoDto;
 import org.example.paqueteria.recargo.Entity.Recargo;
@@ -12,9 +13,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/recargos")
+@RequiredArgsConstructor
 public class RecargoController {
-        @Autowired
-    private RecargoService recargoService;
+    private final RecargoService recargoService;
+
+
+
     // GET: Obtener todos
     @GetMapping
     public ResponseEntity<List<RecargoDto>> obtenerTodos() {
@@ -25,8 +29,7 @@ public class RecargoController {
     // GET: Obtener por ID
     @GetMapping("/{id}")
     public ResponseEntity<RecargoDto> obtenerPorId(@PathVariable Long id) {
-        RecargoDto dto = recargoService.buscarPorId(id);
-        return ResponseEntity.ok(ResponseEntity.ok(dto).getBody()); // Simplificable, pero directo
+        return ResponseEntity.ok(recargoService.buscarPorId(id));
     }
 
     // POST: Crear un nuevo costo base
@@ -39,10 +42,11 @@ public class RecargoController {
     // PUT: Actualizar un costo base existente
     @PutMapping("/{id}")
     public ResponseEntity<RecargoDto> actualizar(@PathVariable Long id, @RequestBody RecargoDto recargoDto) {
-        recargoDto.setId(id); // Aseguramos que se actualice el ID correcto
-        RecargoDto actualizado = recargoService.guardar(recargoDto);
+        // El controller ya no modifica IDs ni busca nada. Solo delega al service:
+        RecargoDto actualizado = recargoService.actualizar(id, recargoDto);
         return ResponseEntity.ok(actualizado);
     }
+
 
     // DELETE: Eliminar por ID
     @DeleteMapping("/{id}")

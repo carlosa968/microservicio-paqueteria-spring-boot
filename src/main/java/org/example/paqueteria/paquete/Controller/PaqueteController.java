@@ -1,5 +1,6 @@
 package org.example.paqueteria.paquete.Controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.paquete.Dto.PaqueteDto;
 import org.example.paqueteria.paquete.Entity.Paquete;
 import org.example.paqueteria.paquete.Mapper.PaqueteMapper;
@@ -8,16 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/paquetes")
+@RequiredArgsConstructor
 public class PaqueteController {
 
     private final PaqueteService paqueteService;
 
-    public PaqueteController(PaqueteService paqueteService) {
-        this.paqueteService = paqueteService;
-    }
 
     @GetMapping
     public List<PaqueteDto> listarTodos() {
@@ -41,17 +40,12 @@ public class PaqueteController {
 
     @PutMapping("/{id}/{clienteId}")
     public PaqueteDto actualizar(@PathVariable Long id, @PathVariable Long clienteId, @RequestBody PaqueteDto dto) {
-        Paquete paqueteExistente = paqueteService.obtenerPorId(id);
-        if (paqueteExistente != null) {
-            paqueteExistente.setPesoKg(dto.getPesoKg());
-            paqueteExistente.setZonaDestino(dto.getZonaDestino());
-            //paqueteExistente.setEsClienteFrecuente(dto.isEsClienteFrecuente());
-            paqueteExistente.setDistanciaKm(dto.getDistanciaKm());
 
-            Paquete actualizado = paqueteService.guardar(paqueteExistente, clienteId);
-            return PaqueteMapper.toDto(actualizado);
-        }
-        return null;
+
+        Paquete actualizado = paqueteService.actualizar(id, clienteId, dto);
+        return PaqueteMapper.toDto(actualizado);
+
+
     }
 
     @DeleteMapping("/{id}")

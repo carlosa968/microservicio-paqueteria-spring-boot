@@ -1,7 +1,10 @@
 package org.example.paqueteria.paquete.Service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.cliente.Entity.Cliente;
 import org.example.paqueteria.cliente.Repository.ClienteRepository;
+import org.example.paqueteria.costobase.Entity.CostoBase;
+import org.example.paqueteria.paquete.Dto.PaqueteDto;
 import org.example.paqueteria.paquete.Entity.Paquete;
 import org.example.paqueteria.costobase.Repository.CostoBaseRepository;
 import org.example.paqueteria.descuento.Repository.DescuentosRepository;
@@ -11,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+
 public class PaqueteService {
 
     // INYECCIÓN DE TODOS LOS REPOSITORIOS NECESARIOS
@@ -19,7 +24,7 @@ public class PaqueteService {
     private final RecargoRepository recargoRepository;
     private final DescuentosRepository descuentosRepository;
     private final ClienteRepository clienteRepository; // <--- Añadido para asociar el cliente
-
+/*
     public PaqueteService(PaqueteRepository paqueteRepository,
                           CostoBaseRepository costoBaseRepository,
                           RecargoRepository recargoRepository,
@@ -31,7 +36,7 @@ public class PaqueteService {
         this.descuentosRepository = descuentosRepository;
         this.clienteRepository = clienteRepository;
     }
-
+*/
     public List<Paquete> obtenerTodos() {
         return paqueteRepository.findAll();
     }
@@ -44,6 +49,20 @@ public class PaqueteService {
         paqueteRepository.deleteById(id);
     }
 
+    public Paquete actualizar(Long id, Long clienteId, PaqueteDto dto) {
+        // 1. Validar si el paquete existe en la base de datos (¡la lógica vive aquí, no en el controller!)
+        Paquete paqueteExistente = paqueteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paquete no encontrado con ID: " + id));
+
+        // 2. Modificar los campos con los nuevos valores que vienen del DTO
+        paqueteExistente.setPesoKg(dto.getPesoKg());
+        paqueteExistente.setZonaDestino(dto.getZonaDestino());
+        paqueteExistente.setDistanciaKm(dto.getDistanciaKm());
+
+        // 3. Reutilizamos tu método guardar para que recalcule costos, recargos, distancias y todo lo necesario
+        return guardar(paqueteExistente, clienteId);
+    }
+
     // Método guardar optimizado y con relación a Cliente
     public Paquete guardar(Paquete paquete, Long clienteId) {
 
@@ -52,54 +71,66 @@ public class PaqueteService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + clienteId));
         paquete.setCliente(cliente);
 
-        // 1. Traemos la regla de Costo Base
-        var costoBaseList = costoBaseRepository.findAll();
-        double costoBase = 0.0;
-        double limiteKilos = 0.0;
-        double costoExtra = 0.0;
+        // 1. Traemos la regla de Costo Base con Optional
+        CostoBase costo1 = costoBaseRepository.findTopByOrderByIdAsc()
+                .orElseThrow(() -> new RuntimeException("No se encontró la configuración del costo base"));
 
-        if (!costoBaseList.isEmpty()) {
-            costoBase = costoBaseList.get(0).getCostoBase();
-            limiteKilos = costoBaseList.get(0).getLimiteKilos();
-            costoExtra = costoBaseList.get(0).getCostoExtra();
+        double costoBase = costo1.getCostoBase();
+        double limiteKilos = costo1.getLimiteKilos();
+        double costoExtra = costo1.getCostoExtra();
+
+        // 2. OBSERVACIÓN 3: Calculamos el descuento de cliente frecuente SOBRE EL COSTO BASE ORIGINAL antes de sumar recargos
+        double descuento = 0.0;
+        long totalEnvios = paqueteRepository.countByClienteId(clienteId);
+        boolean esClienteFrecuente = (totalEnvios >= 2);
+        /*
+
+        double descuento = 0.0;
+        long totalEnvios = paqueteRepository.countByClienteId(clienteId);
+        boolean esClienteFrecuente = (totalEnvios >= 2);
+
+        // Usando programación funcional de Java 21:
+        descuento = descuentosRepository.findByEsClienteFrecuente(esClienteFrecuente)
+        .map(d -> costoBase * d.getDescuento()) // Si lo encuentra, multiplica de inmediato
+        .orElse(0.0); // Si no encuentra nada, regresa 0.0 por defecto
+         */
+        var descuentoOpt = descuentosRepository.findByEsClienteFrecuente(esClienteFrecuente);
+        if (descuentoOpt.isPresent()) {
+            double porcentajeDescuento = descuentoOpt.get().getDescuento();
+            if (porcentajeDescuento > 0) {
+                descuento = costoBase * porcentajeDescuento;
+            }
         }
 
-        // 2. Calculamos según el peso
+        // 3. Iniciamos el cálculo del costo total con el costo base
         double costoTotal = costoBase;
+
+        // 4. Sumamos los kilos extras si aplica
         if (paquete.getPesoKg() > limiteKilos) {
             double kilosExtras = paquete.getPesoKg() - limiteKilos;
             costoTotal += kilosExtras * costoExtra;
         }
 
-        // 3. Buscamos el recargo directamente por zona
+        // 5. Sumamos el recargo por zona
         var recargoOpt = recargoRepository.findByZona(paquete.getZonaDestino());
         if (recargoOpt.isPresent()) {
             costoTotal += recargoOpt.get().getMontoRecargo();
         }
 
-        // 4. LÓGICA DE CLIENTE FRECUENTE Y APLICACIÓN DE DESCUENTO
-        long totalEnvios = paqueteRepository.countByClienteId(clienteId);
-        boolean esClienteFrecuente = (totalEnvios >= 2);
+        // 6. Restamos el descuento que calculamos al inicio de forma limpia
+        costoTotal -= descuento;
 
-        var descuentoOpt = descuentosRepository.findByEsClienteFrecuente(esClienteFrecuente);
-        if (descuentoOpt.isPresent()) {
-            double porcentajeDescuento = descuentoOpt.get().getDescuento();
-            if (porcentajeDescuento > 0) {
-                costoTotal -= (costoTotal * porcentajeDescuento);
-            }
-        }
-
-        // 5. Asignamos la prioridad según la distancia
+        // 7. Asignamos la prioridad según la distancia
         if (paquete.getDistanciaKm() > 500) {
             paquete.setPrioridad("Alta (Envío Express)");
         } else {
             paquete.setPrioridad("Normal");
         }
 
-        // 6. Guardamos el costo final ya con todos los cargos y descuentos aplicados
+        // 8. Guardamos el costo final ya con todo bien calculado
         paquete.setCostoEnvio(costoTotal);
 
-        // 7. Persistimos en la BD
+        // 9. Persistimos en la BD
         return paqueteRepository.save(paquete);
     }
 }

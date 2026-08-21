@@ -1,5 +1,6 @@
 package org.example.paqueteria.cliente.Controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.cliente.Dto.ClienteDto;
 import org.example.paqueteria.cliente.Mapper.ClienteMapper;
 import org.example.paqueteria.cliente.Service.ClienteService;
@@ -11,13 +12,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clientes")
+@RequiredArgsConstructor
+
 public class ClienteController {
 
     private final ClienteService clienteService;
 
-    public ClienteController(ClienteService clienteService) {
-        this.clienteService = clienteService;
-    }
 
     @GetMapping
     public List<ClienteDto> listar() {
@@ -37,16 +37,16 @@ public class ClienteController {
     public ClienteDto crear(@RequestBody ClienteDto dto) {
         return ClienteMapper.toDto(clienteService.guardar(ClienteMapper.toEntity(dto)));
     }
+// CORREGUIR NO DEBE HABE RLOGICA DEBE SER LIGERO
+@PutMapping("/{id}")
+public ResponseEntity<ClienteDto> actualizar(
+        @PathVariable Long id,
+        @RequestBody ClienteDto dto) {
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ClienteDto> actualizar(@PathVariable Long id, @RequestBody ClienteDto dto) {
-        return clienteService.obtenerPorId(id).map(clienteExistente -> {
-            clienteExistente.setNombre(dto.getNombre());
-            clienteExistente.setTelefono(dto.getTelefono());
-            clienteExistente.setDireccion(dto.getDireccion());
-            return ResponseEntity.ok(ClienteMapper.toDto(clienteService.guardar(clienteExistente)));
-        }).orElse(ResponseEntity.notFound().build());
-    }
+    return clienteService.actualizar(id, dto)
+            .map(cliente -> ResponseEntity.ok(ClienteMapper.toDto(cliente)))
+            .orElse(ResponseEntity.notFound().build());
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {

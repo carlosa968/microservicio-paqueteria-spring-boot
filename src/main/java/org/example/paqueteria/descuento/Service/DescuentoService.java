@@ -1,5 +1,6 @@
 package org.example.paqueteria.descuento.Service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.costobase.Dto.CostoBaseDto;
 import org.example.paqueteria.costobase.Entity.CostoBase;
 import org.example.paqueteria.costobase.Mapper.CostoBaseMapper;
@@ -14,9 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class DescuentoService {
-    @Autowired
-    private DescuentosRepository descuentosRepository;
+
+    private final DescuentosRepository descuentosRepository;
 
     public List<DescuentoDto> listarTodos(){
         List<Descuentos> entidades = descuentosRepository.findAll();
@@ -29,7 +31,7 @@ public class DescuentoService {
     // Buscar por ID
     public DescuentoDto buscarPorId(Long id) {
         Descuentos entidad = descuentosRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Costo base no encontrado con el id: " + id));
+                .orElseThrow(() -> new RuntimeException("Descuento  no encontrado con el id: " + id));
         return DescuentoMapper.toDto(entidad);
     }
 
@@ -39,11 +41,20 @@ public class DescuentoService {
         Descuentos entidadGuardada = descuentosRepository.save(entidad);
         return DescuentoMapper.toDto(entidadGuardada);
     }
+    //actulizar
+    public  DescuentoDto actualizar (Long id, DescuentoDto dto){
+        Descuentos descuentoExistente = descuentosRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Descuento no encontrdo con ID: " + id));
+        descuentoExistente.setDescuento(dto.getDescuento());
+        descuentoExistente.setEsClienteFrecuente(dto.isEsClienteFrecuente());
+        Descuentos actulizado = descuentosRepository.save(descuentoExistente);
+        return  DescuentoMapper.toDto(actulizado);
+    }
 
     // Eliminar
     public void eliminar(Long id) {
         if (!descuentosRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar, el costo base con id " + id + " no existe");
+            throw new RuntimeException("No se puede eliminar, el desceunto con id " + id + " no existe");
         }
         descuentosRepository.deleteById(id);
     }

@@ -14,9 +14,9 @@ public class CostoBaseMapper {
 
         CostoBaseDto dto = new CostoBaseDto();
         dto.setId(entity.getId());
-        dto.setCostoFijo(entity.getCostoBase());
+        dto.setCostoBase(entity.getCostoBase());
         dto.setLimiteKilos(entity.getLimiteKilos());
-        dto.setCostoPorKiloExtra(entity.getCostoExtra());
+        dto.setCostoExtra(entity.getCostoExtra());
 
         return dto;
     }
@@ -29,9 +29,9 @@ public class CostoBaseMapper {
 
         CostoBase entity = new CostoBase();
         entity.setId(dto.getId());
-        entity.setCostoBase(dto.getCostoFijo());
+        entity.setCostoBase(dto.getCostoBase());
         entity.setLimiteKilos(dto.getLimiteKilos());
-        entity.setCostoExtra(dto.getCostoPorKiloExtra());
+        entity.setCostoExtra(dto.getCostoExtra());
 
         return entity;
     }
