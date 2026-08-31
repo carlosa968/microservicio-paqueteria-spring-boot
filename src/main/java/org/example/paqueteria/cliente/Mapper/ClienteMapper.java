@@ -9,6 +9,7 @@ public class ClienteMapper {
         ClienteDto dto = new ClienteDto();
         dto.setId(cliente.getId());
         dto.setNombre(cliente.getNombre());
+        dto.setApellido(cliente.getApellido());
         dto.setTelefono(cliente.getTelefono());
         dto.setDireccion(cliente.getDireccion());
         return dto;
@@ -18,6 +19,7 @@ public class ClienteMapper {
         Cliente cliente = new Cliente();
         cliente.setId(dto.getId());
         cliente.setNombre(dto.getNombre());
+        cliente.setApellido(dto.getApellido());
         cliente.setTelefono(dto.getTelefono());
         cliente.setDireccion(dto.getDireccion());
         return cliente;

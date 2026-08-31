@@ -1,3 +1,11 @@
+/*
+Dto : Data traferent object
+Esta clase es especialemtne de traspotrat lo datos necesarios  define que datos viajan hacia el cliente y desde el cliente (API)
+este nos ayuda a no exponer nuestrea entidad completa ni su estructura interna en base de datos
+
+su unico trabajo es transportar datos entre el controller y el cliente que hacela epticion jaja
+ */
+
 package org.example.paqueteria.paquete.Dto;
 
 import lombok.Data;

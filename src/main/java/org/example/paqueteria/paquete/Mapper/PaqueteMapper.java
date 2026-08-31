@@ -1,3 +1,15 @@
+
+/*
+el Mapper : Esta clase existe para que service y controller no tengan que hacer esa conversion
+mauealmtne cada vez que e hace una peticion
+
+simpeltne es el achcihique que copia los datos par que no tod se haga en entity
+
+
+su única chamba es transformar los datos de una Entidad a un DTO y viceversa, para que tus controladores y
+ servicios no se llenen de código repetitivo de copia y pega.
+
+ */
 package org.example.paqueteria.paquete.Mapper;
 
 import org.example.paqueteria.paquete.Dto.PaqueteDto;

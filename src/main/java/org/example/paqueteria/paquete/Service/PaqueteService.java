@@ -1,3 +1,9 @@
+/*
+Service:
+Aqui es donde viene el cerebro del servicio aqui se aplica la logica la reglas de negocio este usa el
+repository para leer guardar consutlar datos y el Mapper para convertir
+ */
+
 package org.example.paqueteria.paquete.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -8,17 +14,18 @@ import org.example.paqueteria.paquete.Dto.PaqueteDto;
 import org.example.paqueteria.paquete.Entity.Paquete;
 import org.example.paqueteria.costobase.Repository.CostoBaseRepository;
 import org.example.paqueteria.descuento.Repository.DescuentosRepository;
+import org.example.paqueteria.paquete.Exceptions.PaqueteNoEncontradoException;
 import org.example.paqueteria.paquete.Repository.PaqueteRepository;
 import org.example.paqueteria.recargo.Repository.RecargoRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-@Service
+@Service // anotacion que le dice a Spring que es un componete de servico
 @RequiredArgsConstructor
 
 public class PaqueteService {
 
-    // INYECCIÓN DE TODOS LOS REPOSITORIOS NECESARIOS
+    // INYECCIÓN DE TODOS LOS REPOSITORIOS NECESARIOS estoe  sppr constructro no por autowired
     private final PaqueteRepository paqueteRepository;
     private final CostoBaseRepository costoBaseRepository;
     private final RecargoRepository recargoRepository;
@@ -42,17 +49,22 @@ public class PaqueteService {
     }
 
     public Paquete obtenerPorId(Long id) {
-        return paqueteRepository.findById(id).orElse(null);
+
+        return paqueteRepository.findById(id).
+                orElseThrow(() -> new PaqueteNoEncontradoException("ID de paquete no encontrado..."));
     }
 
     public void borrar(Long id) {
-        paqueteRepository.deleteById(id);
+
+        if (!paqueteRepository.existsById(id)) {
+            throw new PaqueteNoEncontradoException("No se puede eliminar, el paquete con el ID: " + id + "no existe.");
+        }paqueteRepository.deleteById(id);
     }
 
     public Paquete actualizar(Long id, Long clienteId, PaqueteDto dto) {
         // 1. Validar si el paquete existe en la base de datos (¡la lógica vive aquí, no en el controller!)
         Paquete paqueteExistente = paqueteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Paquete no encontrado con ID: " + id));
+                .orElseThrow(() -> new PaqueteNoEncontradoException("Paquete no encontrado con ID: " + id));
 
         // 2. Modificar los campos con los nuevos valores que vienen del DTO
         paqueteExistente.setPesoKg(dto.getPesoKg());

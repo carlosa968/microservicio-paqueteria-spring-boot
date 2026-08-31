@@ -3,6 +3,7 @@ package org.example.paqueteria.cliente.Controller;
 import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.cliente.Dto.ClienteDto;
 import org.example.paqueteria.cliente.Mapper.ClienteMapper;
+import org.example.paqueteria.cliente.Repository.ClienteRepository;
 import org.example.paqueteria.cliente.Service.ClienteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/clientes")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*") // Ajusta según tu configuración CORS
 
 public class ClienteController {
 
@@ -55,5 +57,12 @@ public ResponseEntity<ClienteDto> actualizar(
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+    /////////////////////////////////////////////////////////////////////////
+    @GetMapping("/buscar")
+    public List<ClienteDto> buscarClientes(@RequestParam("query") String query) {
+        return clienteService.buscarPorNombreOApellido(query).stream()
+                .map(ClienteMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

@@ -9,21 +9,22 @@ import org.example.paqueteria.paquete.Entity.Paquete;
 
 import java.util.List;
 
-@Data // ¡Esta anotación te genera automáticamente todos los Getters, Setters, toString y equals/hashCode!
-@NoArgsConstructor // Te genera el consatructor vacío que pide Hibernate
-@AllArgsConstructor // Te genera el constructor con todos los atributos
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "clientes")
-
 public class Cliente {
     @Id
-    @GeneratedValue (strategy =  GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // En tu clase Cliente.java
+
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    @JsonIgnore // <--- ¡Añade esta anotación!
+    @JsonIgnore
     private List<Paquete> paquetes;
+
     private String nombre;
+    private String apellido;
     private String telefono;
     private String direccion;
 }
