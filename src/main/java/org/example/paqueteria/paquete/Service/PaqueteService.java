@@ -14,6 +14,7 @@ import org.example.paqueteria.paquete.Dto.PaqueteDto;
 import org.example.paqueteria.paquete.Entity.Paquete;
 import org.example.paqueteria.costobase.Repository.CostoBaseRepository;
 import org.example.paqueteria.descuento.Repository.DescuentosRepository;
+import org.example.paqueteria.paquete.Exceptions.IdInvalidoException;
 import org.example.paqueteria.paquete.Exceptions.PaqueteNoEncontradoException;
 import org.example.paqueteria.paquete.Repository.PaqueteRepository;
 import org.example.paqueteria.recargo.Repository.RecargoRepository;
@@ -49,6 +50,9 @@ public class PaqueteService {
     }
 
     public Paquete obtenerPorId(Long id) {
+        if (id <= 0) {
+            throw new IdInvalidoException("El ID no puede ser negativo o cero.");
+        }
 
         return paqueteRepository.findById(id).
                 orElseThrow(() -> new PaqueteNoEncontradoException("ID de paquete no encontrado..."));

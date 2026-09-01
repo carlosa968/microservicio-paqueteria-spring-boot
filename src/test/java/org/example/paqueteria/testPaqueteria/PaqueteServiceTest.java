@@ -1,4 +1,4 @@
-package org.example.paqueteria;
+package org.example.paqueteria.testPaqueteria;
 
 import org.example.paqueteria.cliente.Entity.Cliente;
 import org.example.paqueteria.cliente.Repository.ClienteRepository;
@@ -7,6 +7,8 @@ import org.example.paqueteria.costobase.Repository.CostoBaseRepository;
 import org.example.paqueteria.descuento.Repository.DescuentosRepository;
 import org.example.paqueteria.paquete.Dto.PaqueteDto;
 import org.example.paqueteria.paquete.Entity.Paquete;
+import org.example.paqueteria.paquete.Exceptions.IdInvalidoException;
+import org.example.paqueteria.paquete.Exceptions.PaqueteNoEncontradoException;
 import org.example.paqueteria.paquete.Repository.PaqueteRepository;
 import org.example.paqueteria.paquete.Service.PaqueteService;
 import org.example.paqueteria.recargo.Repository.RecargoRepository;
@@ -19,8 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -162,5 +163,101 @@ public class PaqueteServiceTest {
 
         verify(paqueteRepository, times(1)).deleteById(id);
 
+    }
+//////////////////////////fallo de que algo no existe etc
+    @Test
+    void obtenerPorId_debeLanzarExcepcionSiNoExiste() {
+
+        Long id = 99L;
+
+        when(paqueteRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                PaqueteNoEncontradoException.class,
+                () -> service.obtenerPorId(id)
+        );
+    }
+
+    @Test
+    void borrar_debeLanzarExcepcionSiNoExiste() {
+
+        Long id = 99L;
+
+        when(paqueteRepository.existsById(id))
+                .thenReturn(false);
+
+        assertThrows(
+                PaqueteNoEncontradoException.class,
+                () -> service.borrar(id)
+        );
+
+        verify(paqueteRepository, never()).deleteById(id);
+    }
+
+    @Test
+    void actualizar_debeLanzarExcepcionSiPaqueteNoExiste() {
+
+        Long id = 99L;
+        Long clienteId = 1L;
+
+        PaqueteDto dto = new PaqueteDto();
+
+        when(paqueteRepository.findById(id))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                PaqueteNoEncontradoException.class,
+                () -> service.actualizar(id, clienteId, dto)
+        );
+    }
+    @Test
+    void guardar_debeLanzarExcepcionSiClienteNoExiste() {
+
+        Long clienteId = 99L;
+
+        Paquete paquete = new Paquete();
+
+        when(clienteRepository.findById(clienteId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> service.guardar(paquete, clienteId)
+        );
+    }
+
+    @Test
+    void guardar_debeLanzarExcepcionSiNoExisteCostoBase() {
+
+        Long clienteId = 1L;
+
+        Paquete paquete = new Paquete();
+
+        Cliente cliente = new Cliente();
+
+        when(clienteRepository.findById(clienteId))
+                .thenReturn(Optional.of(cliente));
+
+        when(costoBaseRepository.findTopByOrderByIdAsc())
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> service.guardar(paquete, clienteId)
+        );
+    }
+
+    @Test
+    void obtenerPorId_debeLanzarExcepcionSiIdInvalido() {
+        Long idInvalido = 0L; // Puede ser 0 o un número negativo como -5L
+
+        assertThrows(
+                IdInvalidoException.class,
+                () -> service.obtenerPorId(idInvalido)
+        );
+
+        // Verificamos que la base de datos jamás sea consultada porque la validación frena el proceso antes
+        verify(paqueteRepository, never()).findById(any());
     }
 }

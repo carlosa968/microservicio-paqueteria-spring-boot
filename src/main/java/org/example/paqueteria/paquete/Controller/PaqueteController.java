@@ -12,6 +12,8 @@ import org.example.paqueteria.paquete.Dto.PaqueteDto;
 import org.example.paqueteria.paquete.Entity.Paquete;
 import org.example.paqueteria.paquete.Mapper.PaqueteMapper;
 import org.example.paqueteria.paquete.Service.PaqueteService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,11 +34,19 @@ public class PaqueteController {
                 .map(PaqueteMapper::toDto)
                 .collect(Collectors.toList());
     }
-
+/// modificado par que mand el status
+/*
+Con esta estructura, separaste perfectamente las responsabilidades:
+el Service cuida los datos, las excepciones traducen los errores a códigos HTTP automáticos
+(400 y 404), y el Controller responde con elegancia cuando todo sale bien (200)
+ */
     @GetMapping("/{id}")
-    public PaqueteDto buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<PaqueteDto> buscarPorId(@PathVariable Long id) {
         Paquete paquete = paqueteService.obtenerPorId(id);
-        return PaqueteMapper.toDto(paquete);
+        PaqueteDto paqueteDto = PaqueteMapper.toDto(paquete);
+
+        // Aquí TÚ le dictas explícitamente a Postman qué estatus HTTP quieres mandar
+        return ResponseEntity.status(HttpStatus.OK).body(paqueteDto);
     }
 
     // CAMBIO CLAVE: Ahora acepta tanto /api/paquetes?clienteId=1 como /api/paquetes/1
