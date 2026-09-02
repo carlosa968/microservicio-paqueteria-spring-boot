@@ -8,6 +8,7 @@ package org.example.paqueteria.paquete.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.cliente.Entity.Cliente;
+import org.example.paqueteria.cliente.Exceptions.ClienteNoEncontradoException;
 import org.example.paqueteria.cliente.Repository.ClienteRepository;
 import org.example.paqueteria.costobase.Entity.CostoBase;
 import org.example.paqueteria.paquete.Dto.PaqueteDto;
@@ -82,10 +83,10 @@ public class PaqueteService {
     // Método guardar optimizado y con relación a Cliente
     public Paquete guardar(Paquete paquete, Long clienteId) {
 
-        // 0. Buscamos y asignamos el Cliente obligatorio
+        // 0. Buscamos y asignamos el Cliente obligatorioCliente cliente = clienteRepository.findById(clienteId)
+        //        .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado con ID: " + clienteId));
         Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + clienteId));
-        paquete.setCliente(cliente);
+                .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado con ID: " + clienteId));
 
         // 1. Traemos la regla de Costo Base con Optional
         CostoBase costo1 = costoBaseRepository.findTopByOrderByIdAsc()

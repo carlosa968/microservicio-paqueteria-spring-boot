@@ -2,9 +2,12 @@ package org.example.paqueteria.cliente.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.cliente.Dto.ClienteDto;
+import org.example.paqueteria.cliente.Entity.Cliente;
 import org.example.paqueteria.cliente.Mapper.ClienteMapper;
 import org.example.paqueteria.cliente.Repository.ClienteRepository;
 import org.example.paqueteria.cliente.Service.ClienteService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +33,12 @@ public class ClienteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ClienteDto> obtenerPorId(@PathVariable Long id) {
-        return clienteService.obtenerPorId(id)
-                .map(cliente -> ResponseEntity.ok(ClienteMapper.toDto(cliente)))
-                .orElse(ResponseEntity.notFound().build());
+
+        Cliente cliente = clienteService.obtenerPorId(id);
+        ClienteDto clienteDto = ClienteMapper.toDto(cliente);
+
+        return ResponseEntity.status(HttpStatus.OK).body(clienteDto);
+
     }
 
     @PostMapping
@@ -44,19 +50,17 @@ public class ClienteController {
 public ResponseEntity<ClienteDto> actualizar(
         @PathVariable Long id,
         @RequestBody ClienteDto dto) {
+Cliente actualizado = clienteService.actualizar(id,dto);
+ClienteDto clienteDto= ClienteMapper.toDto(actualizado);
 
-    return clienteService.actualizar(id, dto)
-            .map(cliente -> ResponseEntity.ok(ClienteMapper.toDto(cliente)))
-            .orElse(ResponseEntity.notFound().build());
-}
+    return ResponseEntity.status(HttpStatus.OK).body(clienteDto);}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        if (clienteService.obtenerPorId(id).isPresent()) {
-            clienteService.eliminar(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+
+        clienteService.eliminar(id);
+
+        return ResponseEntity.noContent().build();
     }
     /////////////////////////////////////////////////////////////////////////
     @GetMapping("/buscar")

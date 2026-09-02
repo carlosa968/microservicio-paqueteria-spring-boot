@@ -29,10 +29,12 @@ public class PaqueteController {
     private final PaqueteService paqueteService; //Inyecta el servicio para poder delegarle toda la lógica pesada y los cálculos.
 
     @GetMapping
-    public List<PaqueteDto> listarTodos() {
-        return paqueteService.obtenerTodos().stream()
+    public ResponseEntity<List<PaqueteDto>> listarTodos() {
+        List<PaqueteDto> listaDtos = paqueteService.obtenerTodos().stream()
                 .map(PaqueteMapper::toDto)
                 .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.OK).body(listaDtos);
     }
 /// modificado par que mand el status
 /*
@@ -51,10 +53,14 @@ el Service cuida los datos, las excepciones traducen los errores a códigos HTTP
 
     // CAMBIO CLAVE: Ahora acepta tanto /api/paquetes?clienteId=1 como /api/paquetes/1
     @PostMapping
-    public PaqueteDto crear(@RequestBody PaqueteDto dto, @RequestParam Long clienteId) {
+    public ResponseEntity<PaqueteDto> crear(@RequestBody PaqueteDto dto, @RequestParam Long clienteId) {
         Paquete paquete = PaqueteMapper.toEntity(dto);
         Paquete guardado = paqueteService.guardar(paquete, clienteId);
-        return PaqueteMapper.toDto(guardado);
+        PaqueteDto paqueteDto = PaqueteMapper.toDto(guardado);
+
+        // Estatus 201 Created: El estándar perfecto cuando creas un recurso nuevo en la base de datos
+        return ResponseEntity.status(HttpStatus.CREATED).body(paqueteDto);
+
 
         /*
         Se activa con un POST. @RequestBody lee el JSON que manda el cliente y lo convierte en DTO,
@@ -65,15 +71,18 @@ el Service cuida los datos, las excepciones traducen los errores a códigos HTTP
     }
 
     @PutMapping("/{id}/{clienteId}")
-    public PaqueteDto actualizar(@PathVariable Long id, @PathVariable Long clienteId, @RequestBody PaqueteDto dto) {
+    public ResponseEntity<PaqueteDto> actualizar(@PathVariable Long id, @PathVariable Long clienteId, @RequestBody PaqueteDto dto) {
         Paquete actualizado = paqueteService.actualizar(id, clienteId, dto);
-        return PaqueteMapper.toDto(actualizado);
+        PaqueteDto paqueteDto = PaqueteMapper.toDto(actualizado);
+
+        return ResponseEntity.status(HttpStatus.OK).body(paqueteDto);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        if (paqueteService.obtenerPorId(id) != null) {
-            paqueteService.borrar(id);
-        }
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        paqueteService.borrar(id);
+
+        // Estatus 204 No Content: Significa "Se borró exitosamente pero no te regreso nada en el cuerpo"
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
