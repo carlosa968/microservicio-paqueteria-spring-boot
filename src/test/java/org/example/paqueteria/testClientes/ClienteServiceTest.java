@@ -4,7 +4,6 @@ import org.example.paqueteria.cliente.Entity.Cliente;
 import org.example.paqueteria.cliente.Exceptions.ClienteNoEncontradoException;
 import org.example.paqueteria.cliente.Repository.ClienteRepository;
 import org.example.paqueteria.cliente.Service.ClienteService;
-import org.example.paqueteria.paquete.Entity.Paquete;
 import org.example.paqueteria.paquete.Exceptions.PaqueteNoEncontradoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -150,6 +149,33 @@ public class ClienteServiceTest {
                 () -> service.actualizar(id, clienteDto)
         );
 
+    }
+    // debe elimar exitos
+    @Test
+    void testEliminarCliente(){
+        Long id= 1L;
+        when(clienteRepository.existsById(id)).thenReturn(true);
+
+        service.eliminar(id);
+
+        verify(clienteRepository, times(1)).deleteById(id);
+    }
+    // debe lanzar la excepcion si no escite el id
+
+    @Test
+    void borrar_debeLanzarExcepcionSiNoExiste() {
+
+        Long id = 99L;
+
+        when(clienteRepository.existsById(id))
+                .thenReturn(false);
+
+        assertThrows(
+                ClienteNoEncontradoException.class,
+                () -> service.eliminar(id)
+        );
+
+        verify(clienteRepository, never()).deleteById(id);
     }
 
 

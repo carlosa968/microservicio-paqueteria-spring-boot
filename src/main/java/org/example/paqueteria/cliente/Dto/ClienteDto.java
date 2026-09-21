@@ -9,4 +9,6 @@ public class ClienteDto {
     private  String apellido;
     private String telefono;
     private String direccion;
+    private String email;
+    private String password;
 }

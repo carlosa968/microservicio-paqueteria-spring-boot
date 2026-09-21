@@ -7,6 +7,7 @@ toma la orden y se la lleva al la conicna que es el servico
 
 package org.example.paqueteria.paquete.Controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.paqueteria.paquete.Dto.PaqueteDto;
 import org.example.paqueteria.paquete.Entity.Paquete;
@@ -53,7 +54,7 @@ el Service cuida los datos, las excepciones traducen los errores a códigos HTTP
 
     // CAMBIO CLAVE: Ahora acepta tanto /api/paquetes?clienteId=1 como /api/paquetes/1
     @PostMapping
-    public ResponseEntity<PaqueteDto> crear(@RequestBody PaqueteDto dto, @RequestParam Long clienteId) {
+    public ResponseEntity<PaqueteDto> crear(@Valid @RequestBody PaqueteDto dto, @RequestParam Long clienteId) {
         Paquete paquete = PaqueteMapper.toEntity(dto);
         Paquete guardado = paqueteService.guardar(paquete, clienteId);
         PaqueteDto paqueteDto = PaqueteMapper.toDto(guardado);
@@ -63,7 +64,7 @@ el Service cuida los datos, las excepciones traducen los errores a códigos HTTP
 
 
         /*
-        Se activa con un POST. @RequestBody lee el JSON que manda el cliente y lo convierte en DTO,
+        Se activa con aun POST. @RequestBody lee el JSON que manda el cliente y lo convierte en DTO,
          mientras que @RequestParam extrae el ID del cliente. Convierte el DTO a entidad,
          llama al servicio para calcular costos y guarda, devolviendo el resultado convertido
          otra vez en DTO.
@@ -71,7 +72,7 @@ el Service cuida los datos, las excepciones traducen los errores a códigos HTTP
     }
 
     @PutMapping("/{id}/{clienteId}")
-    public ResponseEntity<PaqueteDto> actualizar(@PathVariable Long id, @PathVariable Long clienteId, @RequestBody PaqueteDto dto) {
+    public ResponseEntity<PaqueteDto> actualizar(@PathVariable Long id, @PathVariable Long clienteId, @Valid @RequestBody PaqueteDto dto) {
         Paquete actualizado = paqueteService.actualizar(id, clienteId, dto);
         PaqueteDto paqueteDto = PaqueteMapper.toDto(actualizado);
 

@@ -85,9 +85,12 @@ public class PaqueteService {
 
         // 0. Buscamos y asignamos el Cliente obligatorioCliente cliente = clienteRepository.findById(clienteId)
         //        .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado con ID: " + clienteId));
+        // 0. Buscamos y asignamos el Cliente obligatorio
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado con ID: " + clienteId));
 
+        // 👉 ¡ESTO ES LO QUE FALTA! Asocia el cliente a la entidad paquete
+        paquete.setCliente(cliente); // (O si manejas el ID directo: paquete.setClienteId(clienteId);)
         // 1. Traemos la regla de Costo Base con Optional
         CostoBase costo1 = costoBaseRepository.findTopByOrderByIdAsc()
                 .orElseThrow(() -> new RuntimeException("No se encontró la configuración del costo base"));

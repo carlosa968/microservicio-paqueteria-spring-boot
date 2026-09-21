@@ -27,4 +27,7 @@ public class Cliente {
     private String apellido;
     private String telefono;
     private String direccion;
+    @Column(unique = true)
+    private String email;
+    private String password;
 }

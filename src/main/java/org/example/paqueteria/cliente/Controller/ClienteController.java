@@ -42,8 +42,15 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ClienteDto crear(@RequestBody ClienteDto dto) {
-        return ClienteMapper.toDto(clienteService.guardar(ClienteMapper.toEntity(dto)));
+    public ResponseEntity<ClienteDto> crear(
+            @RequestBody ClienteDto dto) {
+
+        // Le pasamos el DTO directamente al servicio (él se encarga de convertirlo a entidad y hashear la contraseña)
+        Cliente guardado = clienteService.guardar(dto);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ClienteMapper.toDto(guardado));
     }
 // CORREGUIR NO DEBE HABE RLOGICA DEBE SER LIGERO
 @PutMapping("/{id}")
